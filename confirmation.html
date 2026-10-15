@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>stay.lab: Booking confirmed</title><link rel="stylesheet" href="style.css"><script src="app.js"></script></head><body>
+<header><div><b>stay<span class="dot">.</span>lab</b><span>Booking test site</span></div></header><main><div id="out" class="card"></div>
+<script>
+(function(){
+  var out=document.getElementById('out'), b=null;
+  try{ b=JSON.parse(sessionStorage.getItem('bk_booking')); }catch(e){}
+  if(!b){ out.innerHTML='<h1>No booking found</h1><p class="s">Start from the <a href="index.html">home page</a>.</p>'; return; }
+  out.innerHTML='<h1 class="ok">Booking confirmed</h1><p>Reference <b>'+b.id+'</b></p><p>'+b.room.name+', '+b.nights+' night(s), total £'+b.total+'</p>';
+  var done=[]; try{ done=JSON.parse(localStorage.getItem('bk_done')||'[]'); }catch(e){}
+  if(done.indexOf(b.id)>-1){ out.innerHTML+='<p class="s">Purchase event already sent for this booking (reload guard).</p>'; return; }
+  done.push(b.id); try{ localStorage.setItem('bk_done',JSON.stringify(done)); }catch(e){}
+  track('purchase',{transaction_id:b.id,value:b.total,tax:b.tax,shipping:0,currency:'GBP',items:[item(b.room,b.nights)]});
+})();
+</script></main></body></html>

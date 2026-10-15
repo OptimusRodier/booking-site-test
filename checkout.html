@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>stay.lab: Checkout</title><link rel="stylesheet" href="style.css"><script src="app.js"></script></head><body>
+<header><div><b>stay<span class="dot">.</span>lab</b><span>Booking test site</span></div></header><main>
+<h1>Your details</h1><p class="s" id="sum"></p>
+<form id="f" class="card"><div class="row">
+ <label>Full name<input required id="nm" value="Test Guest"></label>
+ <label>Email<input required type="email" id="em" value="test@example.com"></label>
+ <label>Card (simulated)<input id="cc" value="4242 4242 4242 4242"></label>
+ <button class="btn" type="submit">Confirm booking</button></div></form>
+<script>
+(function(){
+  var q=new URLSearchParams(location.search), r=ROOMS.filter(function(x){return x.id===q.get('room');})[0]||ROOMS[0];
+  var n=nightsBetween(q.get('ci'),q.get('co')), total=r.price*n;
+  document.getElementById('sum').textContent=r.name+', '+n+' night'+(n>1?'s':'')+' ('+q.get('ci')+' to '+q.get('co')+'): £'+total;
+  track('begin_checkout',{currency:'GBP',value:total,items:[item(r,n)]});
+  document.getElementById('f').onsubmit=function(e){
+    e.preventDefault();
+    track('add_payment_info',{currency:'GBP',value:total,payment_type:'card',items:[item(r,n)]});
+    var id='BKG-'+Date.now();
+    sessionStorage.setItem('bk_booking',JSON.stringify({id:id,room:r,nights:n,total:total,tax:+(total/6).toFixed(2),ci:q.get('ci'),co:q.get('co')}));
+    location.href='confirmation.html';
+  };
+})();
+</script></main></body></html>

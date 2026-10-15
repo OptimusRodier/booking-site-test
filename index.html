@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>stay.lab: Book a room</title><link rel="stylesheet" href="style.css"><script src="app.js"></script></head><body>
+<header><div><b>stay<span class="dot">.</span>lab</b><span>Booking test site</span></div></header><main>
+<h1>Book your stay</h1><p class="s">Test booking site. Nothing here is real, payments are simulated.</p>
+<div class="card"><div class="row">
+ <label>Check-in<input type="date" id="ci"></label>
+ <label>Check-out<input type="date" id="co"></label>
+ <label>Guests<select id="g"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>
+</div></div>
+<div id="rooms"></div>
+<script>
+(function(){
+  var d=new Date(); function iso(x){return x.toISOString().slice(0,10);}
+  var ci=document.getElementById('ci'), co=document.getElementById('co');
+  var a=new Date(d.getTime()+7*864e5), b=new Date(d.getTime()+9*864e5); ci.value=iso(a); co.value=iso(b);
+  function draw(){
+    var n=nightsBetween(ci.value,co.value), h='';
+    ROOMS.forEach(function(r){ h+='<div class="card room"><div><h3>'+r.name+'</h3><small>'+r.desc+'</small></div><div style="text-align:right"><div class="price">£'+(r.price*n)+'</div><small>'+n+' night'+(n>1?'s':'')+'</small><br><a class="btn" href="#" data-id="'+r.id+'">Book now</a></div></div>'; });
+    document.getElementById('rooms').innerHTML=h;
+  }
+  ci.onchange=co.onchange=draw; draw();
+  track('view_item_list',{item_list_name:'rooms',items:ROOMS.map(function(r){return item(r,1);})});
+  document.getElementById('rooms').onclick=function(e){
+    var el=e.target.closest('a[data-id]'); if(!el) return; e.preventDefault();
+    var r=ROOMS.filter(function(x){return x.id===el.dataset.id;})[0], n=nightsBetween(ci.value,co.value);
+    track('select_item',{items:[item(r,n)]});
+    location.href='checkout.html?room='+r.id+'&ci='+ci.value+'&co='+co.value+'&g='+document.getElementById('g').value;
+  };
+})();
+</script></main></body></html>
